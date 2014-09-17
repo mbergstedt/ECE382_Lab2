@@ -69,7 +69,23 @@ programEnd:
 
 decryptMessage:
 			push.w	r10
+			push.w	r8
+			push.w	r6
 characterFinder:
+			mov.w	0(r6),		r4
+			mov.w	0(r7),		r5
+			call	#decryptCharacter
+			mov.b	r4,			0(r8)
+			inc		r6
+			inc		r8
+
+			dec		r10
+			tst		r10
+			jnz		characterFinder
+
+			pop		r6
+			pop		r8
+			pop		r10
 
             ret
 
@@ -85,7 +101,7 @@ characterFinder:
 ;-------------------------------------------------------------------------------
 
 decryptCharacter:
-
+			xor		r5,			r4
             ret
 
 ;-------------------------------------------------------------------------------
