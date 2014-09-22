@@ -26,7 +26,12 @@ RESET       mov.w   #__STACK_END,SP         ; Initialize stackpointer
 StopWDT     mov.w   #WDTPW|WDTHOLD,&WDTCTL  ; Stop watchdog timer
 
 ;-------------------------------------------------------------------------------
-                                            ; Main loop here
+;Name: main
+;Author: Matt Bergstedt
+;Function: Finds the length of an encrypted message and the length of its key.
+;			Passes these values, along with the address locations of the encrypted
+;			message in ROM, the key in ROM, and the decrypted message in RAM, into
+;			the decryptMessage subroutine.  Ends with a continuous loop.
 ;-------------------------------------------------------------------------------
 			mov.w	#encrypted,	r6
 			mov.w	#key,		r7
@@ -70,9 +75,10 @@ programEnd:
 ;           the message by value.  Uses the decryptCharacter subroutine to decrypt
 ;           each byte of the message.  Stores the results to the decrypted message
 ;           location.
-;Inputs:
-;Outputs:
-;Registers destroyed:
+;Inputs: length of message in r10, length of key in r11, address location of
+;			encrypted message in r6, address location for decrypted message in r8
+;Outputs: decrypted results in RAM
+;Registers destroyed: none
 ;-------------------------------------------------------------------------------
 
 decryptMessage:
@@ -94,7 +100,7 @@ multiByteDecrypt:
 			dec		r10
 			dec		r11
 			tst		r10							; without it returns to 0x0000 and continuously runs
-			jz		popOut
+			jz		popOut						;
 			tst		r11
 			jnz		multiByteDecrypt
 
@@ -117,9 +123,9 @@ popOut:
 ;Function: Decrypts a byte of data by XORing it with a key byte.  Returns the
 ;           decrypted byte in the same register the encrypted byte was passed in.
 ;           Expects both the encrypted data and key to be passed by value.
-;Inputs:
-;Outputs:
-;Registers destroyed:
+;Inputs: encrypted value in r4, value of key in r5
+;Outputs: decrypted value in r4
+;Registers destroyed: r4
 ;-------------------------------------------------------------------------------
 
 decryptCharacter:
